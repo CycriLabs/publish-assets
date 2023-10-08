@@ -1,0 +1,15 @@
+name: 'Publish Assets'
+description: 'Publishes assets to a GitHub release'
+inputs:
+  release:
+    description: 'The ID of the release to use'
+    default: 'latest'
+  assets:
+    description: 'The assets to publish to the GitHub release'
+    required: true
+outputs:
+  download_urls:
+    description: 'The URLs to download the assets from'
+runs:
+  using: 'node20'
+  main: 'src/index.js'

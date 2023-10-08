@@ -1,0 +1,27 @@
+{
+  "name": "publish-assets",
+  "version": "1.0.0",
+  "description": "A GitHub action to publish generated assets to a GitHub release",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CycriLabs/publish-assets.git"
+  },
+  "keywords": [],
+  "author": "Marc Scheib",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CycriLabs/publish-assets/issues"
+  },
+  "homepage": "https://github.com/CycriLabs/publish-assets#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^5.1.1"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3"
+  }
+}
