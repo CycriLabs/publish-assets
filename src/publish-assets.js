@@ -1,5 +1,9 @@
 import core from '@actions/core';
 import github from '@actions/github';
+import fs from 'fs';
+import mime from 'mime-types';
+import { sep } from 'path';
+import { getContentLength, readFilesRecursively } from './utils.js';
 
 /**
  * Uploads a assets to a GitHub release.
@@ -8,14 +12,14 @@ export async function run() {
   try {
     // Get authenticated GitHub client (Ocktokit): https://github.com/actions/toolkit/tree/master/packages/github#usage
     const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
-    octokit.rest;
 
     // Get the inputs from the workflow file: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
     const releaseTag = core.getInput('release', { required: true });
-    const assets = core.getInput('assets', { required: true });
+    const assetDir = core.getInput('asset_dir', { required: true });
 
     // Upload all assets
     const release = await getReleaseByTag(octokit, releaseTag);
+    const assets = await readAssets(assetDir);
     const downloadUrls = await Promise.all(
       assets.map(asset => uploadAsset(octokit, release, asset))
     );
@@ -35,11 +39,24 @@ export async function run() {
  */
 async function getReleaseByTag(octokit, tag) {
   const { repo } = github.context;
-  return await octokit.rest.repos.getReleaseByTag({
-    owner: repo.owner,
-    repo: repo.repo,
-    tag,
-  });
+  return tag === 'latest'
+    ? octokit.rest.repos.getLatestRelease({
+        owner: repo.owner,
+        repo: repo.repo,
+      })
+    : octokit.rest.repos.getReleaseByTag({
+        owner: repo.owner,
+        repo: repo.repo,
+        tag,
+      });
+}
+
+async function readAssets(assetDir) {
+  const assets = await readFilesRecursively(assetDir);
+  return assets.map(asset => ({
+    path: asset,
+    name: asset.substring(asset.lastIndexOf(sep) + 1),
+  }));
 }
 
 /**
@@ -47,15 +64,20 @@ async function getReleaseByTag(octokit, tag) {
  *
  * @param { import('@octokit/plugin-rest-endpoint-methods/dist-types/types').Api } octokit
  * @param { import('@octokit/plugin-rest-endpoint-methods/dist-types/generated/parameters-and-response-types').RestEndpointMethodTypes["repos"]["getReleaseByTag"]["response"] } release
- * @param { string } assetName
+ * @param { object } asset
  * @returns { Promise<string> } Returns the browser_download_url for the uploaded release asset
  */
-async function uploadAsset(octokit, release, assetName) {
+async function uploadAsset(octokit, release, asset) {
+  const headers = {
+    'content-type': mime.lookup(asset.path),
+    'content-length': await getContentLength(asset.path),
+  };
+
   const uploadAssetResponse = await octokit.rest.repos.uploadReleaseAsset({
     url: release.data.upload_url,
     headers,
-    name: assetName,
-    file: fs.readFileSync(assetPath),
+    name: asset.name,
+    file: fs.readFileSync(asset.path),
   });
 
   // Get the browser_download_url for the uploaded release asset from the response

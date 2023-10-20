@@ -4,13 +4,13 @@ This action publishes assets to a GitHub release.
 
 ## Inputs
 
-### `release`
+### `release_tag`
 
-The ID of the GitHub release to upload assets to. Defaults to `"latest"`.
+The tag of the GitHub release to upload assets to. Defaults to `"latest"`.
 
-### `assets`
+### `asset_dir`
 
-A list of assets to upload. Defaults to `"[]"`.
+The directory that contains all assets to upload. 
 
 ## Outputs
 
@@ -23,5 +23,6 @@ A list of all the download URLs for the uploaded assets.
 ```yaml
 uses: CycriLabs/publish-assets@v1
 with:
-  assets: ['fileA.exe']
+  release_tag: '1.0.0'
+  asset_dir: 'target/distributions'
 ```

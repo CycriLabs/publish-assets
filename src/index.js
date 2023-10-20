@@ -1,3 +1,3 @@
-import { run } from './publish-assets';
+import { run } from './publish-assets.js';
 
 run();
