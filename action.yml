@@ -12,4 +12,4 @@ outputs:
     description: 'The URLs to download the assets from'
 runs:
   using: 'node20'
-  main: 'src/index.js'
+  main: 'dist/index.js'

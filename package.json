@@ -5,7 +5,8 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node ./src/index.js"
+    "start": "node ./src/index.js",
+    "package": "ncc build src/index.js --license licenses.txt"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
     "mime-types": "^2.1.35"
   },
   "devDependencies": {
+    "@vercel/ncc": "^0.38.1",
     "prettier": "^3.0.3"
   }
 }
