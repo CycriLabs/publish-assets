@@ -32893,15 +32893,22 @@ async function run() {
     // Get the inputs from the workflow file: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
     const releaseTag = core.getInput('release_tag') || 'latest';
     const assetDir = core.getInput('asset_dir', { required: true });
+    core.info(`Uploading assets from '${assetDir}' to tag '${releaseTag}'.`);
 
-    // Upload all assets
+    // Load release data from the release specified by the tag
     const release = await getReleaseByTag(octokit, releaseTag);
+    core.info(`Found release ${release.data.name} (${release.data.tag_name}).`);
+
+    // Read assets from the given asset directory
     const assets = await readAssets(assetDir);
+
+    // Upload each asset and wait for all uploads to complete
     const downloadUrls = await Promise.all(
       assets.map(asset => uploadAsset(octokit, release, asset))
     );
 
     // Set the output variable for use by other actions: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
+    core.info(downloadUrls.map(url => `Download URL: ${url}`).join('\n'));
     core.setOutput('download_urls', downloadUrls);
   } catch (error) {
     core.setFailed(error.message);
@@ -32945,16 +32952,22 @@ async function readAssets(assetDir) {
  * @returns { Promise<string> } Returns the browser_download_url for the uploaded release asset
  */
 async function uploadAsset(octokit, release, asset) {
+  const { name, path } = asset;
   const headers = {
     'content-type': mime_types.lookup(asset.path),
     'content-length': await getContentLength(asset.path),
   };
+  const url = release.data.upload_url;
+
+  core.info(
+    `Uploading asset '${name}' from '${path}' to '${url}' with size '${headers['content-length']}' and type '${headers['content-type']}'.`
+  );
 
   const uploadAssetResponse = await octokit.rest.repos.uploadReleaseAsset({
-    url: release.data.upload_url,
+    url,
     headers,
-    name: asset.name,
-    file: external_fs_.readFileSync(asset.path),
+    name,
+    file: external_fs_.readFileSync(path),
   });
 
   // Get the browser_download_url for the uploaded release asset from the response
