@@ -14,7 +14,7 @@ export async function run() {
     const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
 
     // Get the inputs from the workflow file: https://github.com/actions/toolkit/tree/master/packages/core#inputsoutputs
-    const releaseTag = core.getInput('release') || 'latest';
+    const releaseTag = core.getInput('release_tag') || 'latest';
     const assetDir = core.getInput('asset_dir', { required: true });
 
     // Upload all assets
