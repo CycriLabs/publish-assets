@@ -78,7 +78,7 @@ async function uploadAsset(octokit, release, asset) {
   const { name, path } = asset;
   const headers = {
     'content-type': mime.lookup(asset.path) || 'application/octet-stream', // fallback if lookup fails
-    'content-length': await getContentLength(asset.path),
+    //'content-length': await getContentLength(asset.path),
   };
   const url = release.data.upload_url;
 

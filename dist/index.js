@@ -30070,7 +30070,7 @@ var external_path_ = __nccwpck_require__(1017);
  * @returns { Promise<number> } Returns the size of a file in bytes
  */
 async function getContentLength(filePath) {
-  return external_fs_.promises.stat(filePath).then(stat => stat.size);
+  return fs.promises.stat(filePath).then(stat => stat.size);
 }
 
 /**
@@ -30171,7 +30171,7 @@ async function uploadAsset(octokit, release, asset) {
   const { name, path } = asset;
   const headers = {
     'content-type': mime_types.lookup(asset.path) || 'application/octet-stream', // fallback if lookup fails
-    'content-length': await getContentLength(asset.path),
+    //'content-length': await getContentLength(asset.path),
   };
   const url = release.data.upload_url;
 
