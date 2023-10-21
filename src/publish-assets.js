@@ -3,7 +3,7 @@ import github from '@actions/github';
 import fs from 'fs';
 import mime from 'mime-types';
 import { sep } from 'path';
-import { getContentLength, readFilesRecursively } from './utils.js';
+import { readFilesRecursively } from './utils.js';
 
 /**
  * Uploads a assets to a GitHub release.
@@ -78,12 +78,11 @@ async function uploadAsset(octokit, release, asset) {
   const { name, path } = asset;
   const headers = {
     'content-type': mime.lookup(asset.path) || 'application/octet-stream', // fallback if lookup fails
-    //'content-length': await getContentLength(asset.path),
   };
   const url = release.data.upload_url;
 
   core.info(
-    `Uploading asset '${name}' from '${path}' to '${url}' with size '${headers['content-length']}' and type '${headers['content-type']}'.`
+    `Uploading asset '${name}' from '${path}' to '${url}' with type '${headers['content-type']}'.`
   );
 
   const uploadAssetResponse = await octokit.rest.repos.uploadReleaseAsset({
