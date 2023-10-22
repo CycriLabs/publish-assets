@@ -30064,16 +30064,6 @@ var external_path_ = __nccwpck_require__(1017);
 
 
 /**
- * Returns the size of a file.
- *
- * @param { string } filePath
- * @returns { Promise<number> } Returns the size of a file in bytes
- */
-async function getContentLength(filePath) {
-  return fs.promises.stat(filePath).then(stat => stat.size);
-}
-
-/**
  * Reads all files recursively from a directory.
  *
  * @param { string } dir
@@ -30171,12 +30161,11 @@ async function uploadAsset(octokit, release, asset) {
   const { name, path } = asset;
   const headers = {
     'content-type': mime_types.lookup(asset.path) || 'application/octet-stream', // fallback if lookup fails
-    //'content-length': await getContentLength(asset.path),
   };
   const url = release.data.upload_url;
 
   core.info(
-    `Uploading asset '${name}' from '${path}' to '${url}' with size '${headers['content-length']}' and type '${headers['content-type']}'.`
+    `Uploading asset '${name}' from '${path}' to '${url}' with type '${headers['content-type']}'.`
   );
 
   const uploadAssetResponse = await octokit.rest.repos.uploadReleaseAsset({
